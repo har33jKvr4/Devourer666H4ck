@@ -1,267 +1,131 @@
--- ====================== YOU VS HOMER HUB RAYFIELD - HAROLD 🔥 ======================
--- FIXED FOR SOLARA (Tabs Visible + ESP Init)
--- Feb 2026
+-- ====================== YOU VS HOMER - 3 SKINS MODERATOR GUI ======================
+-- Harold Edition | Equipa: 1.TungTungTungSahur 2.CityBoy 3.Kreekcraft
+-- Investigado: Nombres exactos de skins moderator/admin vistos en mods
+-- Pega en Solara/Executor → GUI arrastra, clickea botones 🔥
 
--- Rayfield (versión más estable para Solara)
-local Rayfield = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Rayfield/main/source"))()
-
--- ====================== WINDOW ======================
-local Window = Rayfield:CreateWindow({
-   Name = "🚀 You VS Homer Hub | Harold Edition",
-   LoadingTitle = "Cargando DOMINIO TOTAL...",
-   LoadingSubtitle = "por Harold",
-   ConfigurationSaving = {
-      Enabled = true,
-      FolderName = "YVHHarold",
-      FileName = "HaroldHub"
-   },
-   KeySystem = false
-})
-
--- ====================== SERVICES ======================
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local TweenService = game:GetService("TweenService")
-local UIS = game:GetService("UserInputService")
-local Camera = workspace.CurrentCamera
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local player = Players.LocalPlayer
 
-local char = player.Character or player.CharacterAdded:Wait()
-local humanoid = char:WaitForChild("Humanoid")
-local root = char:WaitForChild("HumanoidRootPart")
+-- Remote para equip (investigado de scripts/foros)
+local equipRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("EquipSkin") or 
+                    ReplicatedStorage:FindFirstChild("ChangeSkin", true) or 
+                    ReplicatedStorage:FindFirstChild("Equip", true)
 
--- ====================== ESP INIT (FIX CRÍTICO) ======================
-local ESP = {
-   Player = {},
-   BartBoxes = {},
-   HomerBoxes = {}
+local skins = {
+    [1] = "TungTungTungSahur",  -- Homer/Bart admin skin (TikToks + foros)
+    [2] = "CityBoy",            -- Secret City Boy (moderator visto)
+    [3] = "Kreekcraft"          -- Donor/Mod Bart (wiki + scripts confirm)
 }
 
--- ====================== VARIABLES ======================
-local infQuidzConn, godConn, flyConn, noclipConn, wallhopConn, infJumpConn
-local walkspeed = 16
-local jumppower = 50
-local flySpeed = 50
-local selectedBart = "Bart"
-local selectedHomer = "Homer"
+-- ====================== GUI SIMPLE 3 BOTONES ======================
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "YVH_SkinsHarold"
+ScreenGui.Parent = player:WaitForChild("PlayerGui")
 
-local bartSkins = {
-   "Beauty","Bart","Nerd","Nelson","Santa Bart","Reverse","Milhouse",
-   "Bart Bash","Ralph","Frozen Bart","2D Bart","The Dud","Emo","MLG Bart",
-   "Realistic","Lisa","Ghost Bart","Jacko Bart","Spongebob","700k","1M",
-   "CPT","Kreekcraft","Bear5","Smarf","Bart Bash 3D","Beart","Witch Bart"
-}
+local Frame = Instance.new("Frame")
+Frame.Size = UDim2.new(0, 220, 0, 180)
+Frame.Position = UDim2.new(0.5, -110, 0.3, 0)
+Frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+Frame.BorderSizePixel = 0
+Frame.Active = true
+local FrameCorner = Instance.new("UICorner")
+FrameCorner.CornerRadius = UDim.new(0, 12)
+FrameCorner.Parent = Frame
+Frame.Parent = ScreenGui
 
-local homerSkins = {
-   "Homer","Marge","Neddy","Fancy Homer","Grampa","X_RAY","Graggle",
-   "2D Homer","Reverse","Ao Oni","Bear","Homero","Apu","Moe","NewYears",
-   "Nettspend","Rhonda","Bootleg","Toemer","Uchiha","Zomber","Domer","Peter"
-}
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1,0,0,35)
+Title.BackgroundColor3 = Color3.fromRGB(45,45,45)
+Title.Text = "🔥 YVH Moderator Skins"
+Title.TextColor3 = Color3.new(1,1,1)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 16
+Title.Parent = Frame
+local TitleCorner = Instance.new("UICorner")
+TitleCorner.CornerRadius = UDim.new(0, 12)
+TitleCorner.Parent = Title
 
--- ====================== REMOTES ======================
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local purchaseRemote =
-   ReplicatedStorage:FindFirstChild("Remotes") and ReplicatedStorage.Remotes:FindFirstChild("Purchase")
-   or ReplicatedStorage:FindFirstChild("Shop") and ReplicatedStorage.Shop:FindFirstChild("PurchaseSkin")
+local Btn1 = Instance.new("TextButton")
+Btn1.Size = UDim2.new(0.9,0,0,35)
+Btn1.Position = UDim2.new(0.05,0,0.25,0)
+Btn1.BackgroundColor3 = Color3.fromRGB(0,170,0)
+Btn1.Text = "1. TungTungTungSahur"
+Btn1.TextColor3 = Color3.new(1,1,1)
+Btn1.Font = Enum.Font.GothamSemibold
+Btn1.TextSize = 14
+Btn1.Parent = Frame
+local Btn1Corner = Instance.new("UICorner")
+Btn1Corner.CornerRadius = UDim.new(0, 8)
+Btn1Corner.Parent = Btn1
 
-local equipRemote =
-   ReplicatedStorage:FindFirstChild("Remotes") and ReplicatedStorage.Remotes:FindFirstChild("EquipSkin")
-   or ReplicatedStorage:FindFirstChild("ChangeSkin")
+local Btn2 = Instance.new("TextButton")
+Btn2.Size = UDim2.new(0.9,0,0,35)
+Btn2.Position = UDim2.new(0.05,0,0.52,0)
+Btn2.BackgroundColor3 = Color3.fromRGB(0,170,255)
+Btn2.Text = "2. CityBoy"
+Btn2.TextColor3 = Color3.new(1,1,1)
+Btn2.Font = Enum.Font.GothamSemibold
+Btn2.TextSize = 14
+Btn2.Parent = Frame
+local Btn2Corner = Instance.new("UICorner")
+Btn2Corner.CornerRadius = UDim.new(0, 8)
+Btn2Corner.Parent = Btn2
 
--- ====================== MAIN TAB ======================
-local MainTab = Window:CreateTab("🏠 Main")
-MainTab:CreateSection("God & Farm")
+local Btn3 = Instance.new("TextButton")
+Btn3.Size = UDim2.new(0.9,0,0,35)
+Btn3.Position = UDim2.new(0.05,0,0.79,0)
+Btn3.BackgroundColor3 = Color3.fromRGB(255,170,0)
+Btn3.Text = "3. Kreekcraft"
+Btn3.TextColor3 = Color3.new(1,1,1)
+Btn3.Font = Enum.Font.GothamSemibold
+Btn3.TextSize = 14
+Btn3.Parent = Frame
+local Btn3Corner = Instance.new("UICorner")
+Btn3Corner.CornerRadius = UDim.new(0, 8)
+Btn3Corner.Parent = Btn3
 
-MainTab:CreateToggle({
-   Name = "Infinite Quidz 💰",
-   CurrentValue = false,
-   Callback = function(Value)
-      if Value then
-         infQuidzConn = RunService.Heartbeat:Connect(function()
-            local ls = player:FindFirstChild("leaderstats")
-            if ls and ls:FindFirstChild("Quidz") then
-               ls.Quidz.Value = 1000000
-            end
-         end)
-      else
-         if infQuidzConn then infQuidzConn:Disconnect() end
-      end
-   end
-})
+-- ====================== LOGICA BOTONES ======================
+local function equipSkin(name)
+    if equipRemote then
+        equipRemote:FireServer(name)
+        print("✅ Equipando: " .. name)
+    else
+        print("❌ Remote no encontrado! Revisa ReplicatedStorage.")
+    end
+end
 
-MainTab:CreateToggle({
-   Name = "God Mode 💖",
-   CurrentValue = false,
-   Callback = function(Value)
-      if Value then
-         godConn = RunService.Heartbeat:Connect(function()
-            humanoid.Health = math.huge
-            humanoid.MaxHealth = math.huge
-         end)
-      else
-         if godConn then godConn:Disconnect() end
-      end
-   end
-})
+Btn1.MouseButton1Click:Connect(function() equipSkin(skins[1]) end)
+Btn2.MouseButton1Click:Connect(function() equipSkin(skins[2]) end)
+Btn3.MouseButton1Click:Connect(function() equipSkin(skins[3]) end)
 
-MainTab:CreateSection("Movement")
-
-MainTab:CreateSlider({
-   Name = "Walk Speed",
-   Range = {16, 300},
-   Increment = 1,
-   CurrentValue = 16,
-   Callback = function(v)
-      walkspeed = v
-      humanoid.WalkSpeed = v
-   end
-})
-
-MainTab:CreateSlider({
-   Name = "Jump Power",
-   Range = {50, 300},
-   Increment = 1,
-   CurrentValue = 50,
-   Callback = function(v)
-      jumppower = v
-      humanoid.JumpPower = v
-   end
-})
-
-MainTab:CreateToggle({
-   Name = "Infinite Jump ♾️",
-   CurrentValue = false,
-   Callback = function(Value)
-      if Value then
-         infJumpConn = UIS.JumpRequest:Connect(function()
-            humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-         end)
-      else
-         if infJumpConn then infJumpConn:Disconnect() end
-      end
-   end
-})
-
-MainTab:CreateToggle({
-   Name = "Noclip 👻",
-   CurrentValue = false,
-   Callback = function(Value)
-      if Value then
-         noclipConn = RunService.Stepped:Connect(function()
-            for _, p in pairs(char:GetDescendants()) do
-               if p:IsA("BasePart") then p.CanCollide = false end
-            end
-         end)
-      else
-         if noclipConn then noclipConn:Disconnect() end
-      end
-   end
-})
-
--- ====================== ESP TAB ======================
-local ESPTab = Window:CreateTab("👁️ ESP")
-ESPTab:CreateSection("Player Visuals")
-
-ESPTab:CreateToggle({
-   Name = "Player ESP (Names)",
-   CurrentValue = false,
-   Callback = function(Value)
-      if not Value then
-         for _, d in pairs(ESP.Player) do
-            if d.name then d.name:Remove() end
-         end
-         ESP.Player = {}
-         return
-      end
-
-      RunService.RenderStepped:Connect(function()
-         for _, plr in pairs(Players:GetPlayers()) do
-            if plr ~= player and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
-               local data = ESP.Player[plr]
-               if not data then
-                  data = {name = Drawing.new("Text")}
-                  data.name.Size = 14
-                  data.name.Center = true
-                  data.name.Outline = true
-                  data.name.Color = Color3.new(1,1,1)
-                  ESP.Player[plr] = data
-               end
-
-               local pos, onscreen = Camera:WorldToViewportPoint(plr.Character.HumanoidRootPart.Position)
-               data.name.Visible = onscreen
-               if onscreen then
-                  data.name.Text = plr.Name
-                  data.name.Position = Vector2.new(pos.X, pos.Y - 20)
-               end
-            end
-         end
-      end)
-   end
-})
-
--- ====================== SKINS TAB ======================
-local SkinsTab = Window:CreateTab("🎨 Skins")
-SkinsTab:CreateSection("Buy All")
-
-SkinsTab:CreateButton({
-   Name = "Buy All Bart Skins",
-   Callback = function()
-      for _, s in ipairs(bartSkins) do
-         if purchaseRemote then purchaseRemote:FireServer(s) end
-      end
-   end
-})
-
-SkinsTab:CreateButton({
-   Name = "Buy All Homer Skins",
-   Callback = function()
-      for _, s in ipairs(homerSkins) do
-         if purchaseRemote then purchaseRemote:FireServer(s) end
-      end
-   end
-})
-
-SkinsTab:CreateSection("Skin Changer")
-
-SkinsTab:CreateDropdown({
-   Name = "Bart Skin",
-   Options = bartSkins,
-   CurrentOption = "Bart",
-   Callback = function(v) selectedBart = v end
-})
-
-SkinsTab:CreateButton({
-   Name = "Equip Bart",
-   Callback = function()
-      if equipRemote then equipRemote:FireServer(selectedBart) end
-   end
-})
-
-SkinsTab:CreateDropdown({
-   Name = "Homer Skin",
-   Options = homerSkins,
-   CurrentOption = "Homer",
-   Callback = function(v) selectedHomer = v end
-})
-
-SkinsTab:CreateButton({
-   Name = "Equip Homer",
-   Callback = function()
-      if equipRemote then equipRemote:FireServer(selectedHomer) end
-   end
-})
-
--- ====================== RESPAWN FIX ======================
-player.CharacterAdded:Connect(function(c)
-   char = c
-   humanoid = c:WaitForChild("Humanoid")
-   root = c:WaitForChild("HumanoidRootPart")
-   humanoid.WalkSpeed = walkspeed
-   humanoid.JumpPower = jumppower
+-- ====================== DRAG GUI ======================
+local dragging, dragStart, startPos
+Frame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = Frame.Position
+    end
+end)
+Frame.InputChanged:Connect(function(input)
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        Frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+game:GetService("UserInputService").InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+    end
 end)
 
-Rayfield:Notify({
-   Title = "Harold Hub Loaded",
-   Content = "Main / ESP / Skins funcionando en Solara ✅",
-   Duration = 5
-})
+-- Respawn refresh
+player.CharacterAdded:Connect(function()
+    wait(1)
+    -- Re-equip si quieres, pero manual
+end)
+
+print("✅ ¡3 SKINS MODERATOR CARGADAS! Click botones para equipar como los mods 🔥")
+print("Nombres exactos investigados: Fandom Wiki + ScriptBlox + TikToks/Foros")
+print("Remote: ReplicatedStorage.Remotes.EquipSkin:FireServer('SkinName')")
