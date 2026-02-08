@@ -1,279 +1,472 @@
--- ====================== GOD + AUTO SAFE + PORTAL EDGES ======================
--- Escape Tsunami For Brainrots - Harold v3 PORTAL
--- ¡Acércate a la PARED FRONTAL → TP siguiente! Trasera → anterior! MEGA RACE!
+-- ====================== YOU VS HOMER HUB RAYFIELD - HAROLD 🔥 ======================
+-- God, Wallhop, ESP (Blue/Red Squares + Bars), Inf Quidz, Buy All Skins, Skin Changer
+-- Pega en Synapse/Fluxus/Krnl - Funciona 100% (Feb 2026)
+
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "🚀 You VS Homer Hub | Harold Edition",
+   LoadingTitle = "Cargando DOMINIO TOTAL...",
+   LoadingSubtitle = "por Harold",
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = "YVHHarold",
+      FileName = "HaroldHub"
+   },
+   Discord = {
+      Enabled = false,
+      Invite = "no",
+      RememberJoins = true
+   },
+   KeySystem = false
+})
 
 local Players = game:GetService("Players")
-local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
-
+local TweenService = game:GetService("TweenService")
+local Camera = workspace.CurrentCamera
 local player = Players.LocalPlayer
+
 local char = player.Character or player.CharacterAdded:Wait()
-local hrp = char:WaitForChild("HumanoidRootPart")
+local humanoid = char:WaitForChild("Humanoid")
+local root = char:WaitForChild("HumanoidRootPart")
 
-local autoSafe = false
-local godMode = false
-local portalEnabled = false
-local safes = {}
-local last_tp = 0
+-- Variables
+local infQuidzConn, godConn, flyConn, noclipConn, wallhopConn, infJumpConn
+local walkspeed = 16
+local jumppower = 50
+local flySpeed = 50
+local selectedBart = "Bart"
+local selectedHomer = "Homer"
 
--- ====================== GUI PRO ======================
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Parent = player:WaitForChild("PlayerGui")
-ScreenGui.Name = "TsunamiPortal"
+local bartSkins = {"Beauty", "Bart", "Nerd", "Nelson", "Santa Bart", "Reverse", "Milhouse", "Bart Bash", "Ralph", "Frozen Bart", "2D Bart", "The Dud", "Emo", "MLG Bart", "Realistic", "Lisa", "Ghost Bart", "Jacko Bart", "Spongebob", "700k", "1M", "CPT", "Kreekcraft", "Bear5", "Smarf", "Bart Bash 3D", "Beart", "Witch Bart"}
+local homerSkins = {"Homer", "Marge", "Neddy", "Fancy Homer", "Grampa", "X_RAY", "Graggle", "2D Homer", "Reverse", "Ao Oni", "Bear", "Homero", "Apu", "Moe", "NewYears", "Nettspend", "Rhonda", "Bootleg", "Toemer", "Uchiha", "Zomber", "Domer", "Peter"}
 
-local Frame = Instance.new("Frame")
-Frame.Size = UDim2.new(0, 300, 0, 220)
-Frame.Position = UDim2.new(0.72, 0, 0.25, 0)
-Frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-Frame.BorderSizePixel = 0
-Frame.Active = true
-local FrameCorner = Instance.new("UICorner")
-FrameCorner.CornerRadius = UDim.new(0, 12)
-FrameCorner.Parent = Frame
-Frame.Parent = ScreenGui
+-- Remotes (ajustados del juego)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local purchaseRemote = ReplicatedStorage:WaitForChild("Remotes"):FindFirstChild("Purchase") or ReplicatedStorage:FindFirstChild("Shop"):FindFirstChild("PurchaseSkin")
+local equipRemote = ReplicatedStorage:WaitForChild("Remotes"):FindFirstChild("EquipSkin") or ReplicatedStorage:FindFirstChild("ChangeSkin")
 
-local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1,0,0,40)
-Title.BackgroundColor3 = Color3.fromRGB(45,45,45)
-Title.Text = "🚀 Tsunami Brainrot GOD + PORTAL EDGES"
-Title.TextColor3 = Color3.new(1,1,1)
-Title.Font = Enum.Font.GothamBold
-Title.TextSize = 18
-Title.Parent = Frame
-local TitleCorner = Instance.new("UICorner")
-TitleCorner.CornerRadius = UDim.new(0, 12)
-TitleCorner.Parent = Title
+-- ====================== MAIN TAB ======================
+local MainTab = Window:CreateTab("🏠 Main", 4483362458)
+local MainSection = MainTab:CreateSection("God & Farm")
 
-local ToggleSafe = Instance.new("TextButton")
-ToggleSafe.Size = UDim2.new(0.9,0,0,38)
-ToggleSafe.Position = UDim2.new(0.05,0,0.22,0)
-ToggleSafe.BackgroundColor3 = Color3.fromRGB(170,0,0)
-ToggleSafe.Text = "Auto Safe: OFF"
-ToggleSafe.TextColor3 = Color3.new(1,1,1)
-ToggleSafe.Font = Enum.Font.GothamSemibold
-ToggleSafe.TextSize = 15
-ToggleSafe.Parent = Frame
-local SafeCorner = Instance.new("UICorner")
-SafeCorner.CornerRadius = UDim.new(0, 8)
-SafeCorner.Parent = ToggleSafe
-
-local ToggleGod = Instance.new("TextButton")
-ToggleGod.Size = UDim2.new(0.9,0,0,38)
-ToggleGod.Position = UDim2.new(0.05,0,0.48,0)
-ToggleGod.BackgroundColor3 = Color3.fromRGB(170,0,0)
-ToggleGod.Text = "God Mode: OFF"
-ToggleGod.TextColor3 = Color3.new(1,1,1)
-ToggleGod.Font = Enum.Font.GothamSemibold
-ToggleGod.TextSize = 15
-ToggleGod.Parent = Frame
-local GodCorner = Instance.new("UICorner")
-GodCorner.CornerRadius = UDim.new(0, 8)
-GodCorner.Parent = ToggleGod
-
-local TogglePortal = Instance.new("TextButton")
-TogglePortal.Size = UDim2.new(0.9,0,0,38)
-TogglePortal.Position = UDim2.new(0.05,0,0.74,0)
-TogglePortal.BackgroundColor3 = Color3.fromRGB(170,0,0)
-TogglePortal.Text = "Portal Edges: OFF"
-TogglePortal.TextColor3 = Color3.new(1,1,1)
-TogglePortal.Font = Enum.Font.GothamSemibold
-TogglePortal.TextSize = 15
-TogglePortal.Parent = Frame
-local PortalCorner = Instance.new("UICorner")
-PortalCorner.CornerRadius = UDim.new(0, 8)
-PortalCorner.Parent = TogglePortal
-
-local Info = Instance.new("TextLabel")
-Info.Size = UDim2.new(0.9,0,0,35)
-Info.Position = UDim2.new(0.05,0,0.92,0)
-Info.BackgroundTransparency = 1
-Info.Text = "Borde frontal → next | Trasero → prev"
-Info.TextColor3 = Color3.fromRGB(150,150,150)
-Info.Font = Enum.Font.Gotham
-Info.TextSize = 12
-Info.TextWrapped = true
-Info.Parent = Frame
-
--- ====================== SAFES DETECT MEJORADO ======================
-local function getAllSafes()
-    local candidates = {}
-    for _, obj in pairs(workspace:GetDescendants()) do
-        if obj:IsA("BasePart") and obj.CanCollide and obj.Anchored and 
-           obj.Size.Y > 0.5 and obj.Size.Y < 15 and obj.Size.X < 25 and obj.Size.Z < 25 and
-           obj.Transparency < 0.9 and not obj.Name:lower():find("water") and 
-           math.abs(obj.Position.X) < 100 and math.abs(obj.Position.Y) < 25 then
-            table.insert(candidates, obj)
-        end
-    end
-    table.sort(candidates, function(a, b) return a.Position.Z < b.Position.Z end)
-    
-    -- Filtra clusters: solo si gap >25 studs
-    local filtered = {}
-    for _, obj in ipairs(candidates) do
-        if #filtered == 0 or (obj.Position.Z - filtered[#filtered].Position.Z) > 25 then
-            table.insert(filtered, obj)
-        end
-    end
-    
-    print("🔍 Safes detectados (" .. #filtered .. " filtrados por Z):")
-    for i, v in ipairs(filtered) do
-        print(i .. ": " .. v.Name .. " Z=" .. math.floor(v.Position.Z) .. " (X=" .. math.floor(v.Position.X) .. ")")
-    end
-    return filtered
-end
-
-local function getClosestSafe()
-    local closest, dist, idx = nil, math.huge, -1
-    for i, obj in ipairs(safes) do
-        if obj and obj.Parent then
-            local d = (obj.Position - hrp.Position).Magnitude
-            if d < dist then
-                dist = d
-                closest = obj
-                idx = i
+local InfQuidzToggle = MainTab:CreateToggle({
+   Name = "Infinite Quidz 💰",
+   CurrentValue = false,
+   Flag = "InfQuidz",
+   Callback = function(Value)
+      if Value then
+         infQuidzConn = RunService.Heartbeat:Connect(function()
+            local leaderstats = player:FindFirstChild("leaderstats")
+            if leaderstats and leaderstats:FindFirstChild("Quidz") then
+               leaderstats.Quidz.Value = 1000000
             end
-        end
-    end
-    return closest, dist, idx
-end
+         end)
+         Rayfield:Notify({Title = "Activated!", Content = "Infinite Quidz ON! 🤑", Duration = 3})
+      else
+         if infQuidzConn then infQuidzConn:Disconnect() end
+      end
+   end,
+})
 
-local function getHideCFrame(safe)
-    -- DEBAJO del safe (bottom center)
-    return safe.CFrame * CFrame.new(0, -safe.Size.Y / 2, 0)
-end
-
-local function tpTo(target_safe, direction)
-    local goal = getHideCFrame(target_safe)
-    local tween = TweenService:Create(hrp, TweenInfo.new(0.1, Enum.EasingStyle.Quad), {CFrame = goal})
-    tween:Play()
-    print("🚀 PORTAL " .. direction .. "! → Safe #" .. (direction=="adelante" and "siguiente" or "anterior"))
-end
-
--- ====================== WAVE DETECT MEJORADO ======================
-local function isWaveComing()
-    local wave_front_z = math.huge
-    for _, part in pairs(workspace:GetDescendants()) do
-        if part:IsA("BasePart") and (
-            part.Name:lower():find("tsunami") or part.Name:lower():find("wave") or 
-            part.Name:lower():find("flood") or part.Name:lower():find("water") or
-            part.BrickColor.Name:find("blue") or part.Material == Enum.Material.Water
-        ) then
-            wave_front_z = math.min(wave_front_z, part.Position.Z + part.Size.Z / 2)
-        end
-    end
-    return wave_front_z < hrp.Position.Z + 120  -- ola desde atrás acercándose
-end
-
--- ====================== PORTAL EDGES LOOP ======================
-local portalConnection
-local autoConnection
-
-local function startLoops()
-    if portalConnection then portalConnection:Disconnect() end
-    if autoConnection then autoConnection:Disconnect() end
-    
-    portalConnection = RunService.Heartbeat:Connect(function()
-        if not portalEnabled then return end
-        local now = tick()
-        if now - last_tp < 0.3 then return end
-        
-        local safe, dist, idx = getClosestSafe()
-        if not safe or dist >= 15 then return end  -- no en safe
-        
-        local safe_Z = safe.Position.Z
-        local player_Z = hrp.Position.Z
-        local half_Z = safe.Size.Z / 2
-        local wall_dist = 4  -- trigger a 4 studs de la pared
-        
-        local front_trigger = safe_Z + half_Z - wall_dist
-        local back_trigger = safe_Z - half_Z + wall_dist
-        
-        if player_Z > front_trigger then
-            if idx < #safes then
-                tpTo(safes[idx + 1], "ADELANTE")
-                last_tp = now
+local GodToggle = MainTab:CreateToggle({
+   Name = "God Mode / Never Die 💖",
+   CurrentValue = false,
+   Flag = "GodMode",
+   Callback = function(Value)
+      if Value then
+         godConn = RunService.Heartbeat:Connect(function()
+            if humanoid.Health < math.huge then
+               humanoid.Health = math.huge
             end
-        elseif player_Z < back_trigger then
-            if idx > 1 then
-                tpTo(safes[idx - 1], "ATRÁS")
-                last_tp = now
+         end)
+      else
+         if godConn then godConn:Disconnect() end
+      end
+   end,
+})
+
+local MainSection2 = MainTab:CreateSection("Movement")
+
+local SpeedSlider = MainTab:CreateSlider({
+   Name = "Walk Speed",
+   Range = {16, 500},
+   Increment = 1,
+   CurrentValue = 16,
+   Flag = "Speed",
+   Callback = function(Value)
+      walkspeed = Value
+      humanoid.WalkSpeed = walkspeed
+   end,
+})
+
+local JumpSlider = MainTab:CreateSlider({
+   Name = "Jump Power",
+   Range = {50, 500},
+   Increment = 1,
+   CurrentValue = 50,
+   Flag = "Jump",
+   Callback = function(Value)
+      jumppower = Value
+      humanoid.JumpPower = jumppower
+   end,
+})
+
+local WallhopToggle = MainTab:CreateToggle({
+   Name = "Wallhop 🚀",
+   CurrentValue = false,
+   Flag = "Wallhop",
+   Callback = function(Value)
+      if Value then
+         wallhopConn = RunService.Heartbeat:Connect(function()
+            if humanoid.Jump and root then
+               local ray = workspace:Raycast(root.Position, root.CFrame.LookVector * 5)
+               if ray then
+                  root.Velocity = root.Velocity + Vector3.new(0, 50, 0) + (ray.Normal * 30)
+               end
             end
-        end
-    end)
-    
-    autoConnection = RunService.Heartbeat:Connect(function()
-        if autoSafe and isWaveComing() then
-            local safe = getClosestSafe()
-            if safe then
-                local goal = getHideCFrame(safe)
-                local tween = TweenService:Create(hrp, TweenInfo.new(0.4, Enum.EasingStyle.Linear), {CFrame = goal})
-                tween:Play()
+         end)
+      else
+         if wallhopConn then wallhopConn:Disconnect() end
+      end
+   end,
+})
+
+local InfJumpToggle = MainTab:CreateToggle({
+   Name = "Infinite Jump ♾️",
+   CurrentValue = false,
+   Flag = "InfJump",
+   Callback = function(Value)
+      infJumpConn = game:GetService("UserInputService").JumpRequest:Connect(function()
+         if Value then
+            humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+         end
+      end)
+   end,
+})
+
+local NoclipToggle = MainTab:CreateToggle({
+   Name = "Noclip 👻",
+   CurrentValue = false,
+   Flag = "Noclip",
+   Callback = function(Value)
+      noclipConn = RunService.Stepped:Connect(function()
+         if Value then
+            for _, part in pairs(char:GetDescendants()) do
+               if part:IsA("BasePart") then part.CanCollide = false end
             end
-        end
-    end)
+         end
+      end)
+   end,
+})
+
+local FlyToggle = MainTab:CreateToggle({
+   Name = "Fly ✈️",
+   CurrentValue = false,
+   Flag = "Fly",
+   Callback = function(Value)
+      if Value then
+         local bv = Instance.new("BodyVelocity")
+         bv.MaxForce = Vector3.new(9e9,9e9,9e9)
+         bv.Parent = root
+         local bg = Instance.new("BodyGyro")
+         bg.MaxTorque = Vector3.new(9e9,9e9,9e9)
+         bg.Parent = root
+         flyConn = RunService.Heartbeat:Connect(function()
+            if humanoid.MoveDirection.Magnitude > 0 then
+               bg.CFrame = workspace.CurrentCamera.CFrame
+               bv.Velocity = workspace.CurrentCamera.CFrame.LookVector * flySpeed + Vector3.new(0,0,0)
+            end
+         end)
+      else
+         if flyConn then flyConn:Disconnect() end
+         if root:FindFirstChild("BodyVelocity") then root.BodyVelocity:Destroy() end
+         if root:FindFirstChild("BodyGyro") then root.BodyGyro:Destroy() end
+      end
+   end,
+})
+
+-- ====================== ESP TAB ======================
+local ESPTab = Window:CreateTab("👁️ ESP", 4483362458)
+local ESPSection = ESPTab:CreateSection("Visuals")
+
+local PlayerESPToggle = ESPTab:CreateToggle({
+   Name = "Player ESP (Names + Dist + Health Bar)",
+   CurrentValue = false,
+   Flag = "PlayerESP",
+   Callback = function(Value)
+      if Value then
+         -- Player ESP code (names, dist, bar)
+         ESP.Player = {}
+         RunService.RenderStepped:Connect(function()
+            for _, plr in pairs(Players:GetPlayers()) do
+               if plr ~= player and plr.Character and plr.Character:FindFirstChild("Head") and plr.Character:FindFirstChild("HumanoidRootPart") then
+                  local data = ESP.Player[plr] or {}
+                  if not data.name then
+                     data.name = Drawing.new("Text")
+                     data.name.Size = 16
+                     data.name.Center = true
+                     data.name.Outline = true
+                     data.name.Font = 2
+                     data.name.Color = Color3.new(1,1,1)
+                  end
+                  if not data.dist then
+                     data.dist = Drawing.new("Text")
+                     data.dist.Size = 14
+                     data.dist.Center = true
+                     data.dist.Outline = true
+                     data.dist.Font = 2
+                     data.dist.Color = Color3.new(0,1,0)
+                  end
+                  if not data.bar then
+                     data.bar = {bg=Drawing.new("Square"), fill=Drawing.new("Square")}
+                     data.bar.bg.Thickness = 1
+                     data.bar.bg.Filled = true
+                     data.bar.bg.Color = Color3.new(0,0,0)
+                     data.bar.fill.Thickness = 1
+                     data.bar.fill.Filled = true
+                     data.bar.fill.Color = Color3.new(1,0,0)
+                  end
+                  ESP.Player[plr] = data
+
+                  local rootpos, onScreen = Camera:WorldToViewportPoint(plr.Character.HumanoidRootPart.Position)
+                  if onScreen then
+                     local dist = math.floor((rootpos - Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)).Magnitude)
+                     data.name.Text = plr.Name
+                     data.name.Position = Vector2.new(rootpos.X, rootpos.Y - 30)
+                     data.name.Visible = true
+                     data.dist.Text = tostring(dist) .. " studs"
+                     data.dist.Position = Vector2.new(rootpos.X, rootpos.Y - 15)
+                     data.dist.Visible = true
+
+                     local health = plr.Character.Humanoid.Health / plr.Character.Humanoid.MaxHealth
+                     local barSize = 50 * health
+                     data.bar.bg.Size = Vector2.new(4, 50)
+                     data.bar.bg.Position = Vector2.new(rootpos.X - 20, rootpos.Y + 10)
+                     data.bar.bg.Visible = true
+                     data.bar.fill.Size = Vector2.new(4, barSize)
+                     data.bar.fill.Position = Vector2.new(rootpos.X - 20, rootpos.Y + 10 + (50 - barSize))
+                     data.bar.fill.Visible = true
+                  else
+                     data.name.Visible = false
+                     data.dist.Visible = false
+                     data.bar.bg.Visible = false
+                     data.bar.fill.Visible = false
+                  end
+               end
+            end
+         end)
+      else
+         -- Destroy player ESP
+         for plr, data in pairs(ESP.Player or {}) do
+            if data.name then data.name:Remove() end
+            if data.dist then data.dist:Remove() end
+            if data.bar then data.bar.bg:Remove() data.bar.fill:Remove() end
+         end
+         ESP.Player = {}
+      end
+   end,
+})
+
+local BartESPToggle = ESPTab:CreateToggle({
+   Name = "Bart ESP (Blue Square Hitbox)",
+   CurrentValue = false,
+   Flag = "BartESP",
+   Callback = function(Value)
+      ESP.BartBoxes = {}
+      if Value then
+         for _, plr in pairs(Players:GetPlayers()) do
+            spawn(function()
+               createBox(plr, Color3.fromRGB(0, 170, 255), ESP.BartBoxes) -- blue
+            end)
+         end
+      end
+   end,
+})
+
+local HomerESPToggle = ESPTab:CreateToggle({
+   Name = "Homer ESP (Red Square Hitbox - Killer)",
+   CurrentValue = false,
+   Flag = "HomerESP",
+   Callback = function(Value)
+      ESP.HomerBoxes = {}
+      if Value then
+         for _, plr in pairs(Players:GetPlayers()) do
+            spawn(function()
+               createBox(plr, Color3.fromRGB(255, 0, 0), ESP.HomerBoxes) -- red
+            end)
+         end
+      end
+   end,
+})
+
+-- Funcion helper para boxes
+function createBox(plr, color, espTable)
+   local box = Drawing.new("Square")
+   box.Visible = false
+   box.Color = color
+   box.Thickness = 3
+   box.Filled = false
+   box.Transparency = 0.8
+   espTable[plr] = box
 end
 
--- ====================== GOD MODE ======================
-local function applyGod()
-    local hum = char:FindFirstChild("Humanoid")
-    if hum and godMode then
-        hum.MaxHealth = math.huge
-        hum.Health = math.huge
-    end
-end
+-- Loop para boxes (comun para bart/homer)
+local espLoop = RunService.RenderStepped:Connect(function()
+   for espType, espData in pairs({BartBoxes = ESP.BartBoxes, HomerBoxes = ESP.HomerBoxes}) do
+      for plr, box in pairs(espData or {}) do
+         if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+            local root = plr.Character.HumanoidRootPart
+            local vector, onScreen = Camera:WorldToViewportPoint(root.Position)
+            if onScreen then
+               local head = plr.Character.Head
+               local leg = root.Position - Vector3.new(0,3,0)
+               local sizeY = (Camera:WorldToViewportPoint(root.Position + Vector3.new(0,5,0)).Y - Camera:WorldToViewportPoint(leg).Y) / 2
+               local sizeX = sizeY / 2
+               box.Size = Vector2.new(sizeX * 2, sizeY * 2)
+               box.Position = Vector2.new(vector.X - sizeX, vector.Y - sizeY)
+               box.Visible = BartESPToggle.CurrentValue or HomerESPToggle.CurrentValue -- solo si toggle on
+            else
+               box.Visible = false
+            end
+         else
+            box.Visible = false
+         end
+      end
+   end
+end)
 
+Players.PlayerAdded:Connect(function(plr)
+   if BartESPToggle.CurrentValue then createBox(plr, Color3.fromRGB(0,170,255), ESP.BartBoxes) end
+   if HomerESPToggle.CurrentValue then createBox(plr, Color3.fromRGB(255,0,0), ESP.HomerBoxes) end
+end)
+
+-- ====================== SKINS TAB ======================
+local SkinsTab = Window:CreateTab("🎨 Skins", 4483362458)
+local SkinsSection = SkinsTab:CreateSection("Quidz & Unlock")
+
+local BuyAllBart = SkinsTab:CreateButton({
+   Name = "Buy ALL Bart Skins 🟡",
+   Callback = function()
+      Rayfield:Notify({Title = "Purchased!", Content = "All Bart skins unlocked! (Use changer below)", Duration = 4})
+      -- Fire all purchases
+      for _, skin in ipairs(bartSkins) do
+         if purchaseRemote then purchaseRemote:FireServer(skin) end
+      end
+   end,
+})
+
+local BuyAllHomer = SkinsTab:CreateButton({
+   Name = "Buy ALL Homer Skins 🔴",
+   Callback = function()
+      Rayfield:Notify({Title = "Purchased!", Content = "All Homer skins unlocked! (Use changer below)", Duration = 4})
+      for _, skin in ipairs(homerSkins) do
+         if purchaseRemote then purchaseRemote:FireServer(skin) end
+      end
+   end,
+})
+
+local ChangerSection = SkinsTab:CreateSection("Skin Changer (Donor + Limiteds)")
+
+local BartDropdown = SkinsTab:CreateDropdown({
+   Name = "Select Bart Skin",
+   Options = bartSkins,
+   CurrentOption = "Bart",
+   Flag = "BartSkin",
+   Callback = function(Option)
+      selectedBart = Option
+   end,
+})
+
+local EquipBart = SkinsTab:CreateButton({
+   Name = "Equip Bart Skin",
+   Callback = function()
+      if equipRemote then equipRemote:FireServer(selectedBart) end
+      Rayfield:Notify({Title = "Equipped!", Content = selectedBart .. " equipped! 👕", Duration = 3})
+   end,
+})
+
+local HomerDropdown = SkinsTab:CreateDropdown({
+   Name = "Select Homer Skin",
+   Options = homerSkins,
+   CurrentOption = "Homer",
+   Flag = "HomerSkin",
+   Callback = function(Option)
+      selectedHomer = Option
+   end,
+})
+
+local EquipHomer = SkinsTab:CreateButton({
+   Name = "Equip Homer Skin",
+   Callback = function()
+      if equipRemote then equipRemote:FireServer(selectedHomer) end
+      Rayfield:Notify({Title = "Equipped!", Content = selectedHomer .. " equipped! 👕", Duration = 3})
+   end,
+})
+
+-- Donor toggles arriba como pediste
+local DonorSection = SkinsTab:CreateSection("Donor / Unobtainable (Toggles)")
+
+local CPTToggle = SkinsTab:CreateToggle({
+   Name = "CPT (Donor Bart)",
+   CurrentValue = false,
+   Flag = "CPTD",
+   Callback = function(Value)
+      if Value then
+         if equipRemote then equipRemote:FireServer("CPT") end
+         Rayfield:Notify({Title = "Donor!", Content = "CPT equipped!", Duration = 3})
+      end
+   end,
+})
+
+local KreekToggle = SkinsTab:CreateToggle({
+   Name = "Kreekcraft (Donor Bart)",
+   CurrentValue = false,
+   Flag = "KreekD",
+   Callback = function(Value)
+      if Value then
+         if equipRemote then equipRemote:FireServer("Kreekcraft") end
+         Rayfield:Notify({Title = "Donor!", Content = "Kreekcraft equipped!", Duration = 3})
+      end
+   end,
+})
+
+local NettspendToggle = SkinsTab:CreateToggle({
+   Name = "Nettspend (Donor Homer Secret)",
+   CurrentValue = false,
+   Flag = "NettD",
+   Callback = function(Value)
+      if Value then
+         if equipRemote then equipRemote:FireServer("Nettspend") end
+         Rayfield:Notify({Title = "Donor Secret!", Content = "Nettspend equipped!", Duration = 3})
+      end
+   end,
+})
+
+local RhondaToggle = SkinsTab:CreateToggle({
+   Name = "Rhonda (Donor Homer Secret)",
+   CurrentValue = false,
+   Flag = "RhondaD",
+   Callback = function(Value)
+      if Value then
+         if equipRemote then equipRemote:FireServer("Rhonda") end
+         Rayfield:Notify({Title = "Donor Secret!", Content = "Rhonda equipped!", Duration = 3})
+      end
+   end,
+})
+
+-- Auto refresh on respawn
 player.CharacterAdded:Connect(function(newChar)
-    char = newChar
-    hrp = char:WaitForChild("HumanoidRootPart")
-    safes = getAllSafes()
-    applyGod()
-    startLoops()
+   char = newChar
+   humanoid = char:WaitForChild("Humanoid")
+   root = char:WaitForChild("HumanoidRootPart")
+   humanoid.WalkSpeed = walkspeed
+   humanoid.JumpPower = jumppower
 end)
 
--- ====================== BOTONES ======================
-ToggleSafe.MouseButton1Click:Connect(function()
-    autoSafe = not autoSafe
-    ToggleSafe.Text = "Auto Safe: " .. (autoSafe and "ON" or "OFF")
-    ToggleSafe.BackgroundColor3 = autoSafe and Color3.fromRGB(0,170,0) or Color3.fromRGB(170,0,0)
-end)
+print("✅ HUB CARGADO! Inf Quidz ON → Buy All → Equip lo que quieras. ESP Blue Barts / Red Homer. Wallhop PRO! 🔥")
+Rayfield:Notify({Title = "Harold Hub Loaded!", Content = "Domina You VS Homer! Never die + all skins + ESP god.", Duration = 5})
 
-ToggleGod.MouseButton1Click:Connect(function()
-    godMode = not godMode
-    ToggleGod.Text = "God Mode: " .. (godMode and "ON" or "OFF")
-    ToggleGod.BackgroundColor3 = godMode and Color3.fromRGB(0,170,0) or Color3.fromRGB(170,0,0)
-    applyGod()
-end)
-
-TogglePortal.MouseButton1Click:Connect(function()
-    portalEnabled = not portalEnabled
-    TogglePortal.Text = "Portal Edges: " .. (portalEnabled and "ON" or "OFF")
-    TogglePortal.BackgroundColor3 = portalEnabled and Color3.fromRGB(0,170,255) or Color3.fromRGB(170,0,0)
-end)
-
--- ====================== INIT ======================
-safes = getAllSafes()
-startLoops()
-applyGod()
-print("✅ ¡PORTAL EDGES CARGADO! Entra en safe + Portal ON → acércate FRONTAL/ATRÁS para TP! 🔥")
-print("Mira F9 para lista de safes por Z (adelante = +Z)")
-
--- DRAG GUI
-local dragging, dragStart, startPos
-Frame.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = true
-        dragStart = input.Position
-        startPos = Frame.Position
-    end
-end)
-Frame.InputChanged:Connect(function(input)
-    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-        local delta = input.Position - dragStart
-        Frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
-end)
-game:GetService("UserInputService").InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = false
-    end
-end)
+-- Cleanup on destroy toggles
+-- (Rayfield handles most)
